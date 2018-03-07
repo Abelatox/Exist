@@ -44,13 +44,9 @@ public class Connection {
 			System.out.println("\nStock actual:");
 
 			while (resultNames.next() && resultPrices.next() && resultAmount.next()) {
-				XMLStreamReader xsrNames = resultNames.getItemAsStream();
-				XMLStreamReader xsrPrices = resultPrices.getItemAsStream();
-				XMLStreamReader xsrAmount = resultAmount.getItemAsStream();
-
-				printAllElements(xsrNames);
-				printAllElements(xsrPrices);
-				printAllElements(xsrAmount);
+				printAllElements(resultNames.getItemAsStream());
+				printAllElements(resultPrices.getItemAsStream());
+				printAllElements(resultAmount.getItemAsStream());
 				System.out.println();
 			}
 
