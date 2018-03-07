@@ -34,42 +34,37 @@ public class Connection {
 	
 	public void listItems() {
 		try {
-
-
 			// Creem XQExpression:
 			XQExpression xqe = connection.createExpression();
 
-			String sNoms = "doc('envasador.xml')/stock/magatzem/producte/name";
-			String sPreus = "doc('envasador.xml')/stock/magatzem/producte/preu";
-			// cad = "doc('xqj/mondial.xml')/mondial/country/name";
+			XQResultSequence resultNames = xqe.executeQuery(Strings.sNoms);
+			XQResultSequence resultPrices = xqe.executeQuery(Strings.sPreus);
+			XQResultSequence resultAmount = xqe.executeQuery(Strings.sAmount);
 
-			System.out.println("Executant instrucció:\n" + sNoms);
-			XQResultSequence resultNames = xqe.executeQuery(sNoms);
-			XQResultSequence resultPrices = xqe.executeQuery(sPreus);
+			System.out.println("\nStock actual:");
 
-			// Mostrem resultats, un a un, convertits a String
-			System.out.println("\nResultats:");
-
-			while (resultNames.next() && resultPrices.next()) {
-
+			while (resultNames.next() && resultPrices.next() && resultAmount.next()) {
 				XMLStreamReader xsrNames = resultNames.getItemAsStream();
 				XMLStreamReader xsrPrices = resultPrices.getItemAsStream();
+				XMLStreamReader xsrAmount = resultAmount.getItemAsStream();
 
 				printAllElements(xsrNames);
 				printAllElements(xsrPrices);
-
+				printAllElements(xsrAmount);
+				System.out.println();
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-
-		} finally { /* Tanquem connexió en qualsevol cas */
-			try {
-				if (connection != null)
-					connection.close();
-			} catch (XQException xe) {
-				xe.printStackTrace();
-			}
+		}
+	}
+	
+	public void closeConnection() {
+		try {
+			if (connection != null)
+				connection.close();
+		} catch (XQException xe) {
+			xe.printStackTrace();
 		}
 	}
 	
@@ -78,10 +73,10 @@ public class Connection {
 			while (reader.hasNext()) {
 				reader.next();
 				if (reader.getEventType() == XMLStreamConstants.START_ELEMENT && !reader.getLocalName().equals("")) {
-					System.out.print(reader.getLocalName()+":");
+					System.out.print(reader.getLocalName()+": ");
 				}
 				if (getNextElement(reader) != "")	
-					System.out.println("\t" + getNextElement(reader));
+					System.out.println(getNextElement(reader));
 			}
 		} catch (XMLStreamException e) {
 			e.printStackTrace();
