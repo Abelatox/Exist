@@ -16,7 +16,7 @@ public class Envasador {
 				con.listItems();
 				break;
 			case 2:
-				con.listItems();
+				con.itemBuy();
 				break;
 			case 3:
 				con.listItems();
@@ -36,8 +36,8 @@ public class Envasador {
 		System.out.println("--------------------");
 		System.out.println("Escull una opció:");
 		System.out.println("1- Llistar productes");
-		System.out.println("2- Afegir producte");
-		System.out.println("3- Eliminar producte");
+		System.out.println("2- Comprar");
+		System.out.println("3- Vendre");
 		System.out.println("4- ???");
 		System.out.println("5- Close");
 		System.out.println("--------------------");

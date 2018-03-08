@@ -1,5 +1,7 @@
 package envasador;
 
+import java.util.Scanner;
+
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -11,6 +13,9 @@ import javax.xml.xquery.XQResultSequence;
 
 public class Connection {
 	XQConnection connection;
+	Scanner sc = new Scanner(System.in);
+	
+	
 	public Connection() {
 		XQDataSource xqs = null;
 
@@ -19,8 +24,8 @@ public class Connection {
 			xqs.setProperty("serverName", "localhost");
 			xqs.setProperty("port", "8080");
 			xqs.setProperty("user", "admin");
-			// xqs.setProperty("password", "root");
-			xqs.setProperty("password", "smx");
+			xqs.setProperty("password", "root");
+			//xqs.setProperty("password", "smx");
 			
 			connection = xqs.getConnection();
 			System.out.println("Connexió establerta amb SGBD ");
@@ -37,13 +42,15 @@ public class Connection {
 			// Creem XQExpression:
 			XQExpression xqe = connection.createExpression();
 
+			XQResultSequence resultIds = xqe.executeQuery(Strings.sId);
 			XQResultSequence resultNames = xqe.executeQuery(Strings.sNoms);
 			XQResultSequence resultPrices = xqe.executeQuery(Strings.sPreus);
 			XQResultSequence resultAmount = xqe.executeQuery(Strings.sAmount);
 
-			System.out.println("\nStock actual:");
+			System.out.println("\nSTOCK ACTUAL:\n-------------");
 
-			while (resultNames.next() && resultPrices.next() && resultAmount.next()) {
+			while (resultIds.next() && resultNames.next() && resultPrices.next() && resultAmount.next()) {
+				printAllElements(resultIds.getItemAsStream());
 				printAllElements(resultNames.getItemAsStream());
 				printAllElements(resultPrices.getItemAsStream());
 				printAllElements(resultAmount.getItemAsStream());
@@ -53,6 +60,82 @@ public class Connection {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void itemBuy() {
+		try {
+			XQExpression xqe = connection.createExpression();
+			
+			System.out.println("\nCOMPRAR PRODUCTE\n----------------");
+			
+			String sTipus = itemGranelEnvas();
+			
+			int iID = idProducte(sTipus);
+			
+			String sID = "for $x in doc(\"envasador/envasador.xml\")/stock/magatzem/producte where $x/id_prod= " + iID +" return ($x/name,$x/amount)";
+			
+			XQResultSequence resultIds = xqe.executeQuery( sID );
+			while( resultIds.next() ) {
+				printAllElements( resultIds.getItemAsStream() );
+			}
+			
+		} catch( Exception e ) {}
+		
+	}
+	
+	public void itemSell() {
+		try {
+			XQExpression xqe = connection.createExpression();
+			
+			System.out.println("\nCOMPRAR PRODUCTE\n----------------");
+			
+			String sTipus = itemGranelEnvas();
+			
+			int iID = idProducte(sTipus);
+			
+			String sID = "for $x in doc(\"envasador/envasador.xml\")/stock/magatzem/producte where $x/id_prod= " + iID +" return ($x/name,$x/amount)";
+			
+			XQResultSequence resultIds = xqe.executeQuery( sID );
+			while( resultIds.next() ) {
+				printAllElements( resultIds.getItemAsStream() );
+			}
+			
+		} catch( Exception e ) {}
+		
+	}
+	
+	public String itemGranelEnvas() {
+		String sTipus = "";
+		
+		do {
+			System.out.println("Producte Envasat[E] o Granel[G]:" );
+			sTipus = sc.next();
+			
+			if( sTipus.equals( "E" ) || sTipus.equals( "G" ) ) {
+			} else {
+				System.out.println( "Valor invalid!" );
+				sTipus = "";
+			}
+		} while( sTipus.equals(""));
+		
+		return sTipus;
+	}
+	
+	public int idProducte( String sTipus) {
+		int iID = -1;
+		
+		do {
+			System.out.println( "Id del producte:");
+			iID = sc.nextInt();
+			
+			if ( sTipus.equals("E") && (iID%2 == 0) 
+					|| sTipus.equals("G") && !(iID%2 == 0)) {
+				
+				System.out.println( "Id invalida!");
+				iID = -1;
+			}
+		} while( iID == -1 );
+		return iID;
 	}
 	
 	public void closeConnection() {
