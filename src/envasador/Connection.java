@@ -1,5 +1,6 @@
 package envasador;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -22,11 +23,12 @@ public class Connection {
 
 		try {
 			xqs = (XQDataSource) Class.forName("net.xqj.exist.ExistXQDataSource").newInstance();
-			xqs.setProperty("serverName", "localhost");
+			xqs.setProperty("serverName", "192.168.2.2");
+			//xqs.setProperty("serverName", "localhost");
 			xqs.setProperty("port", "8080");
 			xqs.setProperty("user", "admin");
-			// xqs.setProperty("password", "root");
-			xqs.setProperty("password", "smx");
+			xqs.setProperty("password", "root");
+			//xqs.setProperty("password", "smx");
 
 			connection = xqs.getConnection();
 			System.out.println("Connexió establerta amb SGBD ");
@@ -73,16 +75,28 @@ public class Connection {
 
 			int iID = idProducte(sTipus);
 
-			String sID = "for $x in doc(\"" + RUTA + "\")/stock/magatzem/producte where $x/id_prod= " + iID	+ " return ($x/name,$x/amount)";
+			String sID = "for $x in doc(\""+RUTA+"\")/stock/magatzem/producte where $x/id_prod= " + iID	+ " return ($x/name,$x/amount)";
 
 			XQResultSequence resultIds = xqe.executeQuery(sID);
+
+			boolean flag = false;
+			ArrayList<String> retorns = new ArrayList<String>();
 			while (resultIds.next()) {
+				//retorns.add();
+				flag = true;
 				printAllElements(resultIds.getItemAsStream());
 			}
-			System.out.print("Amount: ");
-			int iQuant = sc.nextInt();
+			
+			if(flag) {
+				System.out.print("Quantitat a comprar: ");
+				int iQuant = sc.nextInt();
+				//String sComanda = "replace value of node //c[@id = "+iID+"] with ";
+		        String query = "update value doc(\""+RUTA+"\")/stock/magatzem/producte[./id_prod='" + iID + "']/amount with '" + 6 + "'";
+		        xqe.executeCommand(query);
+		   }
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}
