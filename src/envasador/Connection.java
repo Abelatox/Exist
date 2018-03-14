@@ -14,8 +14,9 @@ import javax.xml.xquery.XQResultSequence;
 public class Connection {
 	XQConnection connection;
 	Scanner sc = new Scanner(System.in);
-	
-	
+
+	public static String RUTA = "envasador.xml";
+
 	public Connection() {
 		XQDataSource xqs = null;
 
@@ -24,9 +25,9 @@ public class Connection {
 			xqs.setProperty("serverName", "localhost");
 			xqs.setProperty("port", "8080");
 			xqs.setProperty("user", "admin");
-			xqs.setProperty("password", "root");
-			//xqs.setProperty("password", "smx");
-			
+			// xqs.setProperty("password", "root");
+			xqs.setProperty("password", "smx");
+
 			connection = xqs.getConnection();
 			System.out.println("Connexió establerta amb SGBD ");
 
@@ -36,7 +37,7 @@ public class Connection {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void listItems() {
 		try {
 			// Creem XQExpression:
@@ -61,83 +62,87 @@ public class Connection {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void itemBuy() {
 		try {
 			XQExpression xqe = connection.createExpression();
-			
+
 			System.out.println("\nCOMPRAR PRODUCTE\n----------------");
-			
+
 			String sTipus = itemGranelEnvas();
-			
+
 			int iID = idProducte(sTipus);
-			
-			String sID = "for $x in doc(\"envasador/envasador.xml\")/stock/magatzem/producte where $x/id_prod= " + iID +" return ($x/name,$x/amount)";
-			
-			XQResultSequence resultIds = xqe.executeQuery( sID );
-			while( resultIds.next() ) {
-				printAllElements( resultIds.getItemAsStream() );
+
+			String sID = "for $x in doc(\"" + RUTA + "\")/stock/magatzem/producte where $x/id_prod= " + iID	+ " return ($x/name,$x/amount)";
+
+			XQResultSequence resultIds = xqe.executeQuery(sID);
+			while (resultIds.next()) {
+				printAllElements(resultIds.getItemAsStream());
 			}
+			System.out.print("Amount: ");
+			int iQuant = sc.nextInt();
 			
-		} catch( Exception e ) {}
-		
+		} catch (Exception e) {
+		}
+
 	}
-	
+
 	public void itemSell() {
 		try {
 			XQExpression xqe = connection.createExpression();
-			
+
 			System.out.println("\nCOMPRAR PRODUCTE\n----------------");
-			
+
 			String sTipus = itemGranelEnvas();
-			
+
 			int iID = idProducte(sTipus);
-			
-			String sID = "for $x in doc(\"envasador/envasador.xml\")/stock/magatzem/producte where $x/id_prod= " + iID +" return ($x/name,$x/amount)";
-			
-			XQResultSequence resultIds = xqe.executeQuery( sID );
-			while( resultIds.next() ) {
-				printAllElements( resultIds.getItemAsStream() );
+
+			String sID = "for $x in doc(\"" + RUTA + "\")/stock/magatzem/producte where $x/id_prod= " + iID
+					+ " return ($x/name,$x/amount)";
+
+			XQResultSequence resultIds = xqe.executeQuery(sID);
+			while (resultIds.next()) {
+				printAllElements(resultIds.getItemAsStream());
 			}
-			
-		} catch( Exception e ) {}
-		
+
+		} catch (Exception e) {
+		}
+
 	}
-	
+
 	public String itemGranelEnvas() {
 		String sTipus = "";
-		
+
 		do {
-			System.out.println("Producte Envasat[E] o Granel[G]:" );
+			System.out.println("Producte Envasat[E] o Granel[G]:");
 			sTipus = sc.next();
-			
-			if( sTipus.equals( "E" ) || sTipus.equals( "G" ) ) {
+
+			if (sTipus.equalsIgnoreCase("E") || sTipus.equalsIgnoreCase("G")) {
 			} else {
-				System.out.println( "Valor invalid!" );
+				System.out.println("Valor invalid!");
 				sTipus = "";
 			}
-		} while( sTipus.equals(""));
-		
+		} while (sTipus.equals(""));
+
 		return sTipus;
 	}
-	
-	public int idProducte( String sTipus) {
+
+	public int idProducte(String sTipus) {
 		int iID = -1;
-		
+
 		do {
-			System.out.println( "Id del producte:");
+			System.out.println("Id del producte:");
 			iID = sc.nextInt();
-			
-			if ( sTipus.equals("E") && (iID%2 == 0) 
-					|| sTipus.equals("G") && !(iID%2 == 0)) {
-				
-				System.out.println( "Id invalida!");
+
+			if (sTipus.equalsIgnoreCase("E") && (iID % 2 == 0) || sTipus.equalsIgnoreCase("G") && !(iID % 2 == 0)) {
+
+				System.out.println("Id invalida!");
 				iID = -1;
 			}
-		} while( iID == -1 );
+		} while (iID == -1);
 		return iID;
 	}
-	
+
 	public void closeConnection() {
 		try {
 			if (connection != null)
@@ -146,15 +151,15 @@ public class Connection {
 			xe.printStackTrace();
 		}
 	}
-	
+
 	void printAllElements(XMLStreamReader reader) {
 		try {
 			while (reader.hasNext()) {
 				reader.next();
 				if (reader.getEventType() == XMLStreamConstants.START_ELEMENT && !reader.getLocalName().equals("")) {
-					System.out.print(reader.getLocalName()+": ");
+					System.out.print(reader.getLocalName() + ": ");
 				}
-				if (getNextElement(reader) != "")	
+				if (getNextElement(reader) != "")
 					System.out.println(getNextElement(reader));
 			}
 		} catch (XMLStreamException e) {
