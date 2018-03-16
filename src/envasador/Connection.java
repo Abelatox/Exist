@@ -16,14 +16,12 @@ public class Connection {
 	XQConnection connection;
 	Scanner sc = new Scanner(System.in);
 
-	public static String RUTA = "envasador.xml";
-
 	public Connection() {
 		XQDataSource xqs = null;
 
 		try {
 			xqs = (XQDataSource) Class.forName("net.xqj.exist.ExistXQDataSource").newInstance();
-			xqs.setProperty("serverName", "192.168.2.2");
+			xqs.setProperty("serverName", "192.168.16.5");
 			//xqs.setProperty("serverName", "localhost");
 			xqs.setProperty("port", "8080");
 			xqs.setProperty("user", "admin");
@@ -75,23 +73,27 @@ public class Connection {
 
 			int iID = idProducte(sTipus);
 
-			String sID = "for $x in doc(\""+RUTA+"\")/stock/magatzem/producte where $x/id_prod= " + iID	+ " return ($x/name,$x/amount)";
+			String sID = "for $x in doc(\""+Strings.ruta+"\")/stock/magatzem/producte where $x/id_prod= " + iID	+ " return ($x/name,$x/amount)";
 
 			XQResultSequence resultIds = xqe.executeQuery(sID);
 
 			boolean flag = false;
-			ArrayList<String> retorns = new ArrayList<String>();
+			ArrayList<String> llista;
 			while (resultIds.next()) {
-				//retorns.add();
 				flag = true;
-				printAllElements(resultIds.getItemAsStream());
+				llista = getAllElements(resultIds.getItemAsStream());
+				for(int i=0;i<llista.size();i++) {
+					System.out.println(llista.get(i));
+				}
 			}
 			
 			if(flag) {
+				int quantitat = getQuantitat(xqe,iID);
+				
 				System.out.print("Quantitat a comprar: ");
 				int iQuant = sc.nextInt();
 				//String sComanda = "replace value of node //c[@id = "+iID+"] with ";
-		        String query = "update value doc(\""+RUTA+"\")/stock/magatzem/producte[./id_prod='" + iID + "']/amount with '" + 6 + "'";
+		        String query = "update value doc(\""+Strings.ruta+"\")/stock/magatzem/producte[./id_prod='" + iID + "']/amount with '" + (quantitat + iQuant) + "'";
 		        xqe.executeCommand(query);
 		   }
 			
@@ -100,7 +102,24 @@ public class Connection {
 		}
 
 	}
-
+	public int getQuantitat(XQExpression xqe, int iID) {
+		String sAmount = "for $x in doc(\""+Strings.ruta+"\")/stock/magatzem/producte where $x/id_prod= " + iID	+ " return ($x/amount)";
+		XQResultSequence resultAmount;
+		try {
+			resultAmount = xqe.executeQuery(sAmount);
+			while (resultAmount.next()) {
+				ArrayList<String> llista = getAllElements(resultAmount.getItemAsStream());
+				for(int i=0;i<llista.size();i++) {
+					if(i == 1)
+						return Integer.parseInt(llista.get(i));
+				}
+			}
+		} catch (XQException e) {
+			e.printStackTrace();
+		}
+		
+		return iID;
+	}
 	public void itemSell() {
 		try {
 			XQExpression xqe = connection.createExpression();
@@ -111,7 +130,7 @@ public class Connection {
 
 			int iID = idProducte(sTipus);
 
-			String sID = "for $x in doc(\"" + RUTA + "\")/stock/magatzem/producte where $x/id_prod= " + iID
+			String sID = "for $x in doc(\"" + Strings.ruta + "\")/stock/magatzem/producte where $x/id_prod= " + iID
 					+ " return ($x/name,$x/amount)";
 
 			XQResultSequence resultIds = xqe.executeQuery(sID);
@@ -120,6 +139,7 @@ public class Connection {
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}
@@ -179,6 +199,24 @@ public class Connection {
 		} catch (XMLStreamException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	ArrayList<String> getAllElements(XMLStreamReader reader) {
+		ArrayList<String> list = new ArrayList<String>();
+		try {
+			while (reader.hasNext()) {
+				reader.next();
+				if (reader.getEventType() == XMLStreamConstants.START_ELEMENT && !reader.getLocalName().equals("")) {
+					list.add(reader.getLocalName() + ": ");
+				}
+				if (getNextElement(reader) != "")
+					list.add(getNextElement(reader));
+			}
+			return list;
+		} catch (XMLStreamException e) {
+			e.printStackTrace();
+		}
+		return list;
 	}
 
 	String getNextElement(XMLStreamReader reader) {
