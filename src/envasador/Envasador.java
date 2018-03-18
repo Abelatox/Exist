@@ -19,7 +19,7 @@ public class Envasador {
 				con.itemBuy();
 				break;
 			case 3:
-				//con.listItems();
+				con.itemSell();
 				break;
 			case 4:
 				con.listItems();

@@ -21,8 +21,8 @@ public class Connection {
 
 		try {
 			xqs = (XQDataSource) Class.forName("net.xqj.exist.ExistXQDataSource").newInstance();
-			xqs.setProperty("serverName", "192.168.16.5");
-			//xqs.setProperty("serverName", "localhost");
+			//xqs.setProperty("serverName", "192.168.16.5");
+			xqs.setProperty("serverName", "localhost");
 			xqs.setProperty("port", "8080");
 			xqs.setProperty("user", "admin");
 			xqs.setProperty("password", "root");
@@ -86,17 +86,16 @@ public class Connection {
 					System.out.println(llista.get(i));
 				}
 			}
-			
+
 			if(flag) {
 				int quantitat = getQuantitat(xqe,iID);
-				
+
 				System.out.print("Quantitat a comprar: ");
 				int iQuant = sc.nextInt();
-				//String sComanda = "replace value of node //c[@id = "+iID+"] with ";
-		        String query = "update value doc(\""+Strings.ruta+"\")/stock/magatzem/producte[./id_prod='" + iID + "']/amount with '" + (quantitat + iQuant) + "'";
-		        xqe.executeCommand(query);
-		   }
-			
+				String query = "update value doc(\""+Strings.ruta+"\")/stock/magatzem/producte[./id_prod='" + iID + "']/amount with '" + (quantitat + iQuant) + "'";
+				xqe.executeCommand(query);
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -117,9 +116,10 @@ public class Connection {
 		} catch (XQException e) {
 			e.printStackTrace();
 		}
-		
+
 		return iID;
 	}
+
 	public void itemSell() {
 		try {
 			XQExpression xqe = connection.createExpression();
@@ -134,8 +134,29 @@ public class Connection {
 					+ " return ($x/name,$x/amount)";
 
 			XQResultSequence resultIds = xqe.executeQuery(sID);
+
+			boolean flag = false;
+			ArrayList<String> llista;
 			while (resultIds.next()) {
-				printAllElements(resultIds.getItemAsStream());
+				flag = true;
+				llista = getAllElements(resultIds.getItemAsStream());
+				for(int i=0;i<llista.size();i++) {
+					System.out.println(llista.get(i));
+				}
+			}
+
+			if(flag) {
+				int quantitat = getQuantitat(xqe,iID);
+
+				System.out.print("Quantitat a vendre: ");
+				int iQuant = sc.nextInt();
+				
+				if( quantitat >= iQuant ) {
+					String query = "update value doc(\""+Strings.ruta+"\")/stock/magatzem/producte[./id_prod='" + iID + "']/amount with '" + (quantitat - iQuant ) + "'";
+					xqe.executeCommand(query);
+				} else {
+					System.out.println( "Quantitat invalida!" );
+				}
 			}
 
 		} catch (Exception e) {
@@ -168,7 +189,7 @@ public class Connection {
 			System.out.println("Id del producte:");
 			iID = sc.nextInt();
 
-			if (sTipus.equalsIgnoreCase("E") && (iID % 2 == 0) || sTipus.equalsIgnoreCase("G") && !(iID % 2 == 0)) {
+			if (sTipus.equalsIgnoreCase("E") && !(iID % 2 == 0) || sTipus.equalsIgnoreCase("G") && (iID % 2 == 0)) {
 
 				System.out.println("Id invalida!");
 				iID = -1;
@@ -200,7 +221,7 @@ public class Connection {
 			e.printStackTrace();
 		}
 	}
-	
+
 	ArrayList<String> getAllElements(XMLStreamReader reader) {
 		ArrayList<String> list = new ArrayList<String>();
 		try {
