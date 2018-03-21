@@ -62,6 +62,63 @@ public class Connection {
 			e.printStackTrace();
 		}
 	}
+	
+	public void itemDel() {
+		try {
+			
+			XQExpression xqe = connection.createExpression();
+
+			System.out.println("DELETE PRODUCTE\n----------------");
+			
+			String sTipus = itemGranelEnvas();
+
+			int iID = idProducte(sTipus);
+			
+			String query = "for $x in doc("+Strings.ruta+")/stock/magatzem/producte[ ./id_prod="  + iID + "] "
+					+ "return delete node $x";
+			
+			xqe.executeCommand(query);
+			
+		} catch ( Exception e ) {
+			e.getStackTrace();
+		}
+	}
+
+	public void itemAdd() {
+		
+		String sName = null;
+		String sPreu = "0.00€/u";
+		int iQuantitat = 0;
+		
+		try {
+		
+			XQExpression xqe = connection.createExpression();
+
+			System.out.println("\nADD PRODUCTE\n----------------");
+			
+			String sTipus = itemGranelEnvas();
+
+			int iID = idProducte(sTipus);
+			
+			System.out.println( "Introdueix nom del producte: ");
+			sName = sc.next();
+			
+			String query = "for $x in doc("+Strings.ruta+")/stock/magatzem[ ./id="  + 0	+ "] "
+					+ "return insert node <producte>"
+					+ "<tipus>" + sTipus + "</tipus>"
+					+ "<id_prod>" + iID + "</id_prod>"
+					+ "<name>" + sName + "</name>"
+					+ "<preu>" + sPreu + "</preu>"
+					+ "<amount>" + iQuantitat + "</amount>"
+					+ "</producte> into $x";
+			
+			xqe.executeCommand(query);
+			
+		} catch ( Exception e ) {
+			e.getStackTrace();
+		}
+		
+	}
 
 	public void itemBuy() {
 		try {

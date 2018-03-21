@@ -22,7 +22,8 @@ public class Envasador {
 				con.itemSell();
 				break;
 			case 4:
-				con.listItems();
+				//con.itemDel();
+				con.itemAdd();
 				break;			
 			case 5:
 				con.closeConnection();
