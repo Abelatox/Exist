@@ -20,16 +20,19 @@ public class Envasador {
 				break;
 			case 3:
 				con.itemSell();
-				break;
-			case 4:
-				//con.itemDel();
-				con.itemAdd();
 				break;			
-			case 5:
+			case 4:
 				con.closeConnection();
 				parar = true;
 				break;
+			case 5:
+				con.itemAdd();
+				break;
+			case 6:
+				con.itemDel();
+				break;
 			}
+			
 		}
 	}
 
@@ -39,8 +42,7 @@ public class Envasador {
 		System.out.println("1- Llistar productes");
 		System.out.println("2- Comprar");
 		System.out.println("3- Vendre");
-		System.out.println("4- ???");
-		System.out.println("5- Close");
+		System.out.println("4- Close");
 		System.out.println("--------------------");
 	}
 }

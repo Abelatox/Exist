@@ -73,9 +73,12 @@ public class Connection {
 			String sTipus = itemGranelEnvas();
 
 			int iID = idProducte(sTipus);
-			
-			String query = "for $x in doc("+Strings.ruta+")/stock/magatzem/producte[ ./id_prod="  + iID + "] "
+			/*
+			String query = "for $x in doc('"+Strings.ruta+"')/stock/magatzem[ ./id = 0 ]/producte[ ./id_prod="  + iID + "] "
 					+ "return delete node $x";
+			*/
+			String query = "for $item in doc('"+Strings.ruta+"')/stock/magatzem[ ./id = 0 ]" + 
+					"return $item update delete node $item/producte[ ./id_prod="  + iID + "]";
 			
 			xqe.executeCommand(query);
 			
@@ -102,8 +105,8 @@ public class Connection {
 			
 			System.out.println( "Introdueix nom del producte: ");
 			sName = sc.next();
-			
-			String query = "for $x in doc("+Strings.ruta+")/stock/magatzem[ ./id="  + 0	+ "] "
+			/*
+			String query = "for $x in doc('"+Strings.ruta+"')/stock/magatzem[ ./id="  + 0	+ "] "
 					+ "return insert node <producte>"
 					+ "<tipus>" + sTipus + "</tipus>"
 					+ "<id_prod>" + iID + "</id_prod>"
@@ -111,8 +114,30 @@ public class Connection {
 					+ "<preu>" + sPreu + "</preu>"
 					+ "<amount>" + iQuantitat + "</amount>"
 					+ "</producte> into $x";
+			*/
 			
+			String query = "update insert node <producte> "
+					+ "<tipus>" + sTipus + "</tipus> "
+					+ "<prod_id> " + iID + "</prod_id>"
+					+ "<name>"+ sName+"</name>"
+					+ "<preu>" + sPreu + "</preu>"
+					+ "<amount>" + iQuantitat + "</amount>"
+					+ "</producte> into doc(\"" + Strings.ruta +"\")/stock/magatzem[./id="+0+"]/*[last()]";
+			
+			//String query = "update insert node <producte> </producte> into doc(\"" + Strings.ruta +"\")/stock/magatzem[./id="+0+"]/*[last()]";
+			//String query2 = "update insert node <id_prod> " + iID + " </id_prod> into doc(\"" + Strings.ruta +"\")/stock/magatzem[./id="+0+"]/prodcute/*[last()]";
+			/*
+			String query = "for $x in doc(\""+Strings.ruta+"\")/stock/magatzem/magatzem[ ./id="  + 0	+ "] "
+					+ "return insert nodes <producte>"
+					+ "<tipus>" + sTipus + "</tipus>"
+					+ "<id_prod>" + iID + "</id_prod>"
+					+ "<name>" + sName + "</name>"
+					+ "<preu>" + sPreu + "</preu>"
+					+ "<amount>" + iQuantitat + "</amount>"
+					+ "</producte> into $x";
+					*/
 			xqe.executeCommand(query);
+			//xqe.executeCommand(query2);
 			
 		} catch ( Exception e ) {
 			e.getStackTrace();
