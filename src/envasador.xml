@@ -1,0 +1,36 @@
+<stock>
+	<magatzem>
+	    <id>0</id>
+        <producte>
+            <tipus>G</tipus>
+            <id_prod>1</id_prod>
+            <name>Sal</name>
+            <preu>3.5€/Kg</preu>
+            <amount>6</amount>
+        </producte>
+        <producte>
+            <tipus>E</tipus>
+            <id_prod>2</id_prod>
+            <name>Veri 1.5L</name>
+            <preu>1€/u</preu>
+            <amount>3</amount>
+        </producte>
+	</magatzem>
+	<magatzem>
+	    <id>1</id>
+		<producte>
+            <tipus>G</tipus>
+            <id_prod>5</id_prod>
+            <name>Sucre</name>
+            <preu>1.75€/Kg</preu>
+            <amount>9</amount>
+        </producte>
+        <producte>
+            <tipus>E</tipus>
+            <id_prod>8</id_prod>
+            <name>Oli 5L</name>
+            <preu>4.99€/u</preu>
+            <amount>14</amount>
+        </producte>
+	</magatzem>
+</stock>
